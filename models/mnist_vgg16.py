@@ -12,11 +12,7 @@ def mnist_vgg16(pretrained, n_classes, freeze):
 
   # replace classifier
   model.classifier = torch.nn.Sequential(
-    # torch.nn.Linear(in_features=25088, out_features=4096, bias=True),
     torch.nn.Linear(in_features=6272, out_features=4096, bias=True),
-    # torch.nn.ReLU(inplace=True),
-    # torch.nn.Dropout(p=0.5, inplace=False),
-    # torch.nn.Linear(in_features=4096, out_features=4096, bias=True),
     torch.nn.ReLU(inplace=True),
     torch.nn.Dropout(p=0.5, inplace=False),
     torch.nn.Linear(in_features=4096, out_features=n_classes, bias=True),
@@ -25,5 +21,5 @@ def mnist_vgg16(pretrained, n_classes, freeze):
   # replace input
   model.features = model.features[:10]
   model.features[0] = torch.nn.Conv2d(1, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
-
+  
   return model

@@ -1,4 +1,4 @@
-import models
+from models import get_model
 from utils.get_datasets import get_datasets
 from utils.experiment_utils import evaluate, train
 from evaluators.evaluator import Evaluator
@@ -25,7 +25,7 @@ CONFIG = {
     "saver_kwargs": {
         "mode": 'epochs',
         "epochs_to_save": [0,1,2,3,4,5,6,7,8,9]
-    }
+    },
 }
 
 def get_valid_path(experiment_path):
@@ -49,7 +49,7 @@ def run_training(
     save_model,
     scheduler,
     scheduler_kwargs,
-    saver_kwargs
+    saver_kwargs,
 ):
     # INIT
     experiment_path = get_valid_path(experiment_path)
@@ -66,8 +66,10 @@ def run_training(
     # _, ood_test_loader = get_datasets(ood_dataset, batch_size_train=256, batch_size_test=1024)
 
     # model
-    model_builder = getattr(models, model_name)
-    model = model_builder(pretrained, n_classes, freeze)
+    model = get_model(model_name, pretrained, n_classes, freeze)
+    
+    if torch.cuda.is_available():
+        model.cuda()
 
     # init optimizer
     optimizer_class = getattr(torch.optim, optimizer_name)
