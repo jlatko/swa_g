@@ -1,6 +1,8 @@
 from models import get_model
 from utils.get_datasets import get_datasets
 from utils.experiment_utils import evaluate, train
+from utils.torch_utils import to_gpu
+from utils.get_scheduler import get_scheduler
 from evaluators.evaluator import Evaluator
 import torch
 from modules.model_saver import ModelSaver
@@ -8,8 +10,7 @@ import os
 import json
 
 CONFIG = {
-    "in_domain_dataset": "MNIST",
-    # "ood_dataset": 'KMNIST',
+    "dataset": "MNIST",
     "pretrained": True,
     "freeze": True,
     "n_classes": 10,
@@ -19,6 +20,7 @@ CONFIG = {
     "optimizer_kwargs": {
         "lr": 3e-4,
     },
+    "load_model_path": None,
     "save_model": True,
     "scheduler": None,
     "scheduler_kwargs": {},
@@ -38,7 +40,7 @@ def get_valid_path(experiment_path):
 
 def run_training(
     experiment_path,
-    in_domain_dataset,
+    dataset,
     pretrained,
     freeze,
     n_classes,
@@ -46,6 +48,7 @@ def run_training(
     model_name,
     optimizer_name,
     optimizer_kwargs,
+    load_model_path,
     save_model,
     scheduler,
     scheduler_kwargs,
@@ -60,16 +63,16 @@ def run_training(
         json.dump(config, fh)
 
     train_loader, test_loader = get_datasets(
-        in_domain_dataset, batch_size_train=256, batch_size_test=1024
+        dataset, batch_size_train=256, batch_size_test=1024
     )
-    # TODO: some metrics and evaluation on OOD datasets
-    # _, ood_test_loader = get_datasets(ood_dataset, batch_size_train=256, batch_size_test=1024)
 
     # model
     model = get_model(model_name, pretrained, n_classes, freeze)
+    if load_model_path:
+        weights = load_model_weights(load_model_path())
+        model.load_state_dict(weights)
     
-    if torch.cuda.is_available():
-        model.cuda()
+    to_gpu(model)
 
     # init optimizer
     optimizer_class = getattr(torch.optim, optimizer_name)
@@ -83,8 +86,7 @@ def run_training(
     saver = ModelSaver(experiment_path, **saver_kwargs)
     
     if scheduler is not None:
-        scheduler_class = getattr(torch.optim.lr_scheduler, scheduler)
-        scheduler = scheduler_class(optimizer, scheduler_kwargs)
+        scheduler = get_scheduler(scheduler, train_loader, optimizer, **scheduler_kwargs)
 
     for i in range(n_epochs):
         # train

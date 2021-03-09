@@ -1,9 +1,10 @@
 from tqdm import tqdm
+from utils.torch_utils import to_gpu
 
 def evaluate(epoch, loader, model, evaluator, loss, label='VAL'):
     model.eval()
     for X, t in tqdm(loader):
-        preds = model(X)
+        preds = model(to_gpu(X))
         batch_loss = loss(preds, t)
         evaluator.update(
             loss=batch_loss.cpu().detach().numpy(), 
@@ -19,7 +20,7 @@ def train(epoch, loader, model, evaluator, optimizer, loss, scheduler=None):
     model.train()
     for X, t in tqdm(loader):
         optimizer.zero_grad()
-        preds = model(X)
+        preds = model(to_gpu(X))
         batch_loss = loss(preds, t)
         evaluator.update(
             loss=batch_loss.cpu().detach().numpy(), 
