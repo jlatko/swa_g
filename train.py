@@ -1,4 +1,4 @@
-from models import get_model
+from models.get_model import get_model
 from utils.get_datasets import get_datasets
 from utils.experiment_utils import evaluate, train
 from utils.torch_utils import to_gpu
@@ -69,7 +69,7 @@ def run_training(
     # model
     model = get_model(model_name, pretrained, n_classes, freeze)
     if load_model_path:
-        weights = load_model_weights(load_model_path())
+        weights = load_model_weights(load_model_path)
         model.load_state_dict(weights)
     
     to_gpu(model)

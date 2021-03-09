@@ -3,7 +3,8 @@ import os
 
 def to_gpu(x):
     if torch.cuda.is_available():
-        x.cuda()
+        return x.cuda()
+    return x
 
 def load_model_weights(path, epoch=None):
     if epoch is None:
