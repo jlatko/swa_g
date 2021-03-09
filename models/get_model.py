@@ -1,5 +1,6 @@
 from models import mnist_vgg16
 from torchvision import models
+import torch
 
 def get_model(model_name, pretrained, n_classes, freeze):
     if model_name == 'mnist_vgg16':
