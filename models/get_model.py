@@ -18,6 +18,6 @@ def get_model(model_name, pretrained, n_classes, freeze):
         model.classifier[-1] = torch.nn.Linear(in_features=last_in, out_features=n_classes, bias=True)
     else:
         last_in = model.fc.in_features
-          model.fc = torch.nn.Linear(in_features=last_in, out_features=n_classes, bias=True)
+        model.fc = torch.nn.Linear(in_features=last_in, out_features=n_classes, bias=True)
 
     return model
