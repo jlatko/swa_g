@@ -1,7 +1,7 @@
 from models.get_model import get_model
 from utils.get_datasets import get_datasets
 from utils.experiment_utils import evaluate, train
-from utils.torch_utils import to_gpu
+from utils.torch_utils import to_gpu, load_model_weights
 from utils.get_scheduler import get_scheduler
 from evaluators.evaluator import Evaluator
 import torch
