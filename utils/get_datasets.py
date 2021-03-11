@@ -9,7 +9,7 @@ opener.addheaders = [('User-agent', 'Mozilla/5.0')]
 urllib.request.install_opener(opener)
 
 def get_datasets(name, batch_size_train=256, batch_size_test=1024, test_only=False, 
-                num_workers=4, pin_memory=True, transformation_kwargs=None):
+                num_workers=2, pin_memory=True, transformation_kwargs=None):
     # TODO: validation
     dataset = getattr(datasets, name)
 
@@ -22,17 +22,17 @@ def get_datasets(name, batch_size_train=256, batch_size_test=1024, test_only=Fal
     else:
         train_loader = torch.utils.data.DataLoader(
             dataset(f'{name.lower()}_data', train=True, download=True,
-                        transform=train_transform,
+                        transform=train_transform),
             batch_size=batch_size_train, shuffle=True, num_workers=num_workers, pin_memory=True)
 
     test_loader = torch.utils.data.DataLoader(
         dataset(f'{name.lower()}_data', train=False, download=test_only,
-                    transform=test_transform,
+                    transform=test_transform),
         batch_size=batch_size_test, shuffle=False, num_workers=num_workers, pin_memory=True)
     
     return train_loader, test_loader
 
-def get_transformations(flip=True, crop=True, crop_size=32, crop_padding=4, normalize='cifar'):
+def get_transformations(flip=True, crop=True, crop_size=32, crop_padding=4, normalize=None):
     train_transformations = []
     test_transformations = []
 

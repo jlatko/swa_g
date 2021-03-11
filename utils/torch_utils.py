@@ -1,7 +1,7 @@
 import torch
 import os
 from collections import OrderedDict
-from utils.experiment_utils import get_available_epochs
+from utils.other import get_available_epochs
 
 def to_gpu(x):
     if torch.cuda.is_available():

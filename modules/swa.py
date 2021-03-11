@@ -1,6 +1,6 @@
 import torch
 import os
-from utils.experiment_utils import get_available_epochs
+from utils.other import get_available_epochs
 
 def load_swa_weights(path, epochs):
     n = len(epochs)

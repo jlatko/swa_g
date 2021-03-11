@@ -11,23 +11,42 @@ import json
 
 CONFIG = {
     "dataset": "MNIST",
+    "dataset_config": {
+        "batch_size_train": 256, 
+        "batch_size_test": 1024,
+        "transformation_kwargs": {
+            "flip": True, 
+            "crop": True, 
+            "crop_size": 32, 
+            "crop_padding": 4, 
+            "normalize": None
+        },
+    },
     "pretrained": True,
     "freeze": True,
     "n_classes": 10,
     "n_epochs": 10,
     "model_name": "mnist_vgg16",
-    "optimizer_name": "Adam",
+    "optimizer_name": "SGD",
     "optimizer_kwargs": {
         "lr": 3e-4,
+        "weight_decay": 1e-4,
+        "momentum": 0.9
     },
     "load_model_path": None,
     "save_model": True,
     "scheduler": None,
     "scheduler_kwargs": {},
+    # possible options
+    # "scheduler": 'LambdaLR',
+    # "scheduler": 'CosineAnnealingWarmRestarts',
+    # "scheduler_kwargs": {
+    #     'cycle_length': 5, 
+    #     'min_lr': 1e-5,
+    # },
     "saver_kwargs": {
-        "mode": 'epochs',
-        "epochs_to_save": [0,1,2,3,4,5,6,7,8,9]
-    },
+        "mode": 'last',
+    }
 }
 
 def get_valid_path(experiment_path):
@@ -41,6 +60,7 @@ def get_valid_path(experiment_path):
 def run_training(
     experiment_path,
     dataset,
+    dataset_config,
     pretrained,
     freeze,
     n_classes,
@@ -63,7 +83,8 @@ def run_training(
         json.dump(config, fh)
 
     train_loader, test_loader = get_datasets(
-        dataset, batch_size_train=256, batch_size_test=1024
+        dataset, 
+        **dataset_config
     )
 
     # model
@@ -100,3 +121,5 @@ def run_training(
         if save_model:
             saver.save_if_needed(model, i, test_metrics) # TODO: don't do early stopping on test set
 
+if __name__ == '__main__':
+    run_training('./experiments/test', **CONFIG)
