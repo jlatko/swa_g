@@ -40,3 +40,6 @@ def train(epoch, loader, model, evaluator, optimizer, loss, scheduler=None):
     evaluator.log_metrics()
     new_metrics = evaluator.next_epoch()
     return new_metrics
+
+def get_available_epochs(path):
+    return [int(f.split('.')[0].split('_')[1]) for f in os.listdir(path) if f.startswith('model_')]
